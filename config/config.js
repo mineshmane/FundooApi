@@ -1,4 +1,4 @@
-require('dotenv').config()
+
 module.exports = {
     mongoUrl: 'mongodb://localhost:27017/fundoo',
     secretKey:process.env.secretKey,

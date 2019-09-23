@@ -1,4 +1,5 @@
 var express = require('express');
+require('dotenv').config()
 var bodyParser = require('body-parser');
 var config = require('./config/config')
 var app = express();
@@ -8,6 +9,7 @@ const mongoose = require('mongoose');
 app.use(bodyParser.json())
 app.use(expressValidator())
 app.use('/', route);
+port=process.env.port
 
 
 mongoose.connect(config.mongoUrl, { useNewUrlParser: true,
@@ -19,7 +21,7 @@ mongoose.connect(config.mongoUrl, { useNewUrlParser: true,
         console.log('Database connected successFully');
     }
 })
-app.listen(3000, (err, data) => {
+app.listen(port, (err, data) => {
     if (err) {
 console.log(" error in listening ",err);
 
