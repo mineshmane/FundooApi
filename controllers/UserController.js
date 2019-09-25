@@ -26,12 +26,22 @@ class Registarion {
             .withMessage('Max 10 alphabet allowed in password')
         let error = req.validationErrors();
         if (error) {
+
             return res.status(500).send(error);
+
         } else {
-            let data = await service.registerUserService(req.body);
-            console.log("in controller ", data);
-            res.send(data)
-            console.log("waitong");
+
+            await service.registerUserService(req.body)
+            .then((registerdData) => {
+
+                res.status(200).send(registerdData);
+
+            }).catch((error) => {
+
+                res.status(500).send(error);
+
+            });
+
         }
     }
 
@@ -39,32 +49,44 @@ class Registarion {
 
     async loginUser(req, res) {
         console.log(" in login controller ", req.body);
-        let loginData = await service.loginService(req.body);
-        console.log(loginData);
-        res.send(loginData)
+        await service.loginService(req.body).then((loginData) => {
+            res.status(200).send(loginData);
+        }).catch((error) => {
+            res.status(500).send(error)
+        });
+        // console.log(loginData);
+        // res.send(loginData)
     }
 
     async forgetPassword(req, res) {
         console.log(" forget controller ", req.body);
 
-        let forgetData = await service.forgetPasswordService(req.body);
-        res.send(forgetData);
+        await service.forgetPasswordService(req.body).then((forgotData) => {
+            res.status(200).send(forgotData);
+        }).catch((error) => {
+            res.status(500).send(error);
+        });
+
     }
     async resetPassword(req, res) {
 
-    //     req.check('password')
-    //         .isLength({ min: 3 })
-    //         .withMessage('Min 3 alphabet required')
-    //         .isLength({ max: 10 })
-    //         .withMessage('Max 10 alphabet allowed in password')
-    //   let  error = req.validationErrors();
-    //     if (error) {
-    //         return res.status(500).send(error);
-    //     } else {
-            
-    //     }
-        let reseted = await service.resetPasswordService(req.body)
-        res.send(reseted)
+        //     req.check('password')
+        //         .isLength({ min: 3 })
+        //         .withMessage('Min 3 alphabet required')
+        //         .isLength({ max: 10 })
+        //         .withMessage('Max 10 alphabet allowed in password')
+        //   let  error = req.validationErrors();
+        //     if (error) {
+        //         return res.status(500).send(error);
+        //     } else {
+
+        //     }
+        await service.resetPasswordService(req.body).then((resetedData) => {
+            res.status(200).send(resetedData);
+        }).catch((error) => {
+            res.status(500).send(error);
+        })
+
 
     }
 

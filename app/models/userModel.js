@@ -28,26 +28,23 @@ var User = mongoose.model('User', userSchema);
 
 
 
-function hashGenerate(password) {
-    return new Promise((resolve, reject) => {
-        byCrypt.hash(password, 10).then((password) => {
-            console.log(password);
-
-            resolve({ 'data': password })
-        })
-            .catch((error) => {
-                reject({ 'errr': error })
-            })
-    })
-
-}
-
 class UserModel {
     constructor() {
 
     }
+    hashGenerate(password) {
+        return new Promise((resolve, reject) => {
+            byCrypt.hash(password, 10).then((password) => {
+                console.log(password);
 
+                resolve({ 'data': password })
+            })
+                .catch((error) => {
+                    reject({ 'errr': error })
+                })
+        })
 
+    }
 
     async findUser(req) {
         return new Promise((resolve, reject) => {
@@ -66,7 +63,6 @@ class UserModel {
         })
     };
 
-
     async  RegisterUser(req) {
         let response = {
             "success": true,
@@ -75,16 +71,18 @@ class UserModel {
         }
         return new Promise((resolve, reject) => {
             req.save().then((data) => {
-                response.success = data,
+                console.log(" data in register ", data);
+
+                response.success = true,
                     response.message = 'registeration succesfull',
-                    response.data = req,
+                    response.data = data,
                     response.status = 200
 
                 resolve({ response })
             }).catch((error) => {
                 response.success = data,
                     response.message = 'registeration failed',
-                    response.data = req,
+                    response.data = '',
                     response.status = 500,
                     response.error = error
                 reject({ response })
@@ -142,14 +140,16 @@ class UserModel {
     async resetPasswordModel(req) {
 
         console.log(" model req", req.newpassword);
-        let hashedPassword = await hashGenerate(req.newpassword)
+        let hashedPassword = await this.hashGenerate(req.newpassword)
         console.log("hashed password ", hashedPassword.data);
 
         return new Promise((resolve, reject) => {
             User.updateOne({ _id: req.data.id }, { password: hashedPassword.data }).then((data) => {
-                console.log(" data after hashed ",data);
-                resolve({success:true})
+                console.log(" data after hashed ", data);
+                resolve({ success: true })
 
+            }).catch((error) => {
+                reject(error)
             })
         })
 

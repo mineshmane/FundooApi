@@ -1,7 +1,7 @@
 const userModel = require('../app/models/userModel');
 const byCrypt = require('bcrypt');
 var jwt = require('jsonwebtoken');
-const mailer=require('../middleware/nodeMailer')
+const mailer = require('../middleware/nodeMailer')
 const config = require('../config/config')
 const UserModel = new userModel.UserModel;
 const newModel = userModel.User;
@@ -23,17 +23,15 @@ function hashGenerate(password) {
 
 class Service {
 
-   
+
     async registerUserService(userObject) {
 
         let foundUser = await UserModel.findUser(userObject);
-
-
         let len = foundUser.data.length
         if (len == 0) {
             console.log(" inside data");
 
-            let hashedPassword = await hashGenerate(userObject.password)
+            let hashedPassword = await hashGenerate(userObject.password);
             let newUser = new newModel({
                 firstName: userObject.firstName,
                 lastName: userObject.lastName,
@@ -111,10 +109,10 @@ class Service {
         let found = await UserModel.findUser(forgetdata);
         console.log(found.data.length);
         if (found.data.length > 0) {
-            var token = jwt.sign({ email: found.data[0].email, id: found.data[0]._id }, config.secretKey, { expiresIn: '8h' });
+            var token = jwt.sign({ email: found.data[0].email, id: found.data[0]._id }, config.secretKey, { expiresIn: '24h' });
             console.log(" token aivalable", token);
             // const url = `http://localhost:3000/#/reset/${token}`;
-    
+
             // //call sendMail function
             // mailer.mail(found.data[0].email, url);
             var url = "http://localhost:3000/reset" + token;
@@ -128,14 +126,14 @@ class Service {
 
     }
 
-    async resetPasswordService(req){
-        console.log("rerererer req",req.newpassword);
-        
+    async resetPasswordService(req) {
+        console.log("rerererer req", req.newpassword);
+
         // let hashedPassword = await hashGenerate(req.newpassword)
         console.log(" hashed password");
-        
-       let result= await UserModel.resetPasswordModel(req);
-       return result;
+
+        let result = await UserModel.resetPasswordModel(req);
+        return result;
 
     }
 
