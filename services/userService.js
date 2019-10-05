@@ -2,6 +2,8 @@ const userModel = require('../app/models/userModel');
 const byCrypt = require('bcrypt');
 var jwt = require('jsonwebtoken');
 const mailer = require('../middleware/nodeMailer')
+const upload = require('../middleware/fileUplading')
+var multer = require('multer')
 const config = require('../config/config')
 const UserModel = new userModel.UserModel;
 const newModel = userModel.User;
@@ -36,7 +38,8 @@ class Service {
                 firstName: userObject.firstName,
                 lastName: userObject.lastName,
                 email: userObject.email,
-                password: hashedPassword.data
+                password: hashedPassword.data,
+                imageProfile: userObject.imageUrl
             });
             console.log(" new user ", newUser);
 
@@ -70,6 +73,8 @@ class Service {
                                     firstName: data.data[0].firstName,
                                     lastName: data.data[0].lastName,
                                     userId: data.data[0]._id,
+                                    email: data.data[0].email,
+                                    imageUrl: data.data[0].imageUrl,
                                     token: token
                                 }
                                 response.success = result,
@@ -135,6 +140,67 @@ class Service {
         let result = await UserModel.resetPasswordModel(req);
         return result;
 
+    }
+
+    getAllUsers(req) {
+        return UserModel.getAllUsers(req);
+    }
+
+
+
+
+    uploadFile(id, imageUrl, res) {
+
+
+        UserModel.uploadFile(id, imageUrl, (err, result1) => {
+            if (err) {
+                console.log('Service Error', err)
+                res(err)
+            } else {
+                console.log('Service In ')
+                res(null, result1)
+            }
+        })
+        //     try {
+        //         // id = req.decoded.payload._id
+        //         console.log(" req in service=====>>>>>> ", req);
+        //         var storage = multer.diskStorage({
+        //             destination: (req, file, cb) => {
+        //                 console.log(" in the destination ", req, file);
+
+        //                 cb(null, '/home/admin1/gitclone/fundoo/editorMinesh/FundooNotesBackEnd/public/images/uploads')
+        //             },
+        //             filename: (req, file, cb) => {
+        //                 console.log(" in the destination ", req.file, file);
+        //                 cb(null, req.file.fieldname + '-' + Date.now().toString())
+        //             }
+        //         });
+        //         var upload = multer({ storage: storage });
+
+        //         // const uploadImage = upload.single('image')
+        //         // console.log(" req======>> ", req.file);
+
+        //         const uploadImage = upload.single('image')
+
+
+
+
+        //         console.log('1234')
+
+        //         uploadImage(req, res, (error, result) => {
+        //             if (error) {
+        //                 return res(error)
+        //             } else {
+        //                 imageUrl = req.file.location
+        //                 console.log(id, imageUrl)
+
+
+        //             }
+        //         })
+        //     } catch (err) {
+        //         console.log('Catch Error In services ', err)
+        //         res(err)
+        //     }
     }
 
 }

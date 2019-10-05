@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const model = require('./labelSchema');
 const byCrypt = require('bcrypt');
 var jwt = require('jsonwebtoken');
+const ObjectId = mongoose.Types.ObjectId;
 
 
 const config = require('../../config/config');
@@ -18,25 +19,33 @@ const notesSchema = new mongoose.Schema({
     isPin: Boolean,
     isArchived: Boolean,
     isDeleted: Boolean,
-    reminder: String,
+    reminder: [String],
+    images: Array,
     color: String,
     label: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'label'
+
     }],
     collaberators: [{
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'collaberator'
+
+        ref: 'User'
     }]
 }, {
     'timestamps': true
 });
+
+
+
+
 
 let Notes = mongoose.model('Notes', notesSchema);
 const labelS = mongoose.model('label');
 class NoteModel {
 
     async createNoteModel(req) {
+        console.log(" requ ", req.data);
 
         let response = {
             message: '',
@@ -52,7 +61,7 @@ class NoteModel {
             reminder: req.reminder ? req.reminder : "",
             color: req.color ? req.color : "",
             label: req.labels ? req.labels : [],
-            userId: req.userId
+            userId: req.data.id
 
         });
         return new Promise((resolve, reject) => {
@@ -88,8 +97,12 @@ class NoteModel {
             err: ''
         }
         return new Promise((resolve, reject) => {
-            Notes.find({ userId: req.id })
-                // .populate('label') // only return the Persons name
+            console.log(" req in schema", req);
+            var id = mongoose.Types.ObjectId(req.id);
+
+            Notes.find({ $or: [{ userId: req.id }, { collaberators: mongoose.Types.ObjectId(req.id) }] })
+                .populate('collaberators')
+                .populate('label') // only return the Persons name , { collaberators: { $elemMatch: { userId: req.id } } }
                 // .exec()
                 .then((AllNotes) => {
                     response.success = true;
@@ -109,8 +122,10 @@ class NoteModel {
     }
 
     findNote(req) {
+        console.log(" req in find notes", req);
+
         return new Promise((resolve, reject) => {
-            Notes.findById({ _id: req.id }).then((data) => {
+            Notes.findById({ _id: req.noteId }).then((data) => {
                 resolve(data)
             }).catch((err) => {
                 reject(err)
@@ -118,6 +133,8 @@ class NoteModel {
         })
     }
     updateNote(req, data) {
+        console.log(" req in model ", req);
+
         return new Promise((resolve, reject) => {
             var response = {
                 success: false,
@@ -134,10 +151,10 @@ class NoteModel {
                 color: req.color ? req.color : data.color,
                 userId: req.data.id
             }
-            Notes.updateOne({ _id: req.id }, noteModel).then((data) => {
+            Notes.updateOne({ _id: req.noteId }, noteModel).then((result) => {
                 response.success = true;
                 response.message = "Note Updated Successfully";
-                response.data = data;
+                response.data = result;
                 response.status = 200
                 resolve(response)
             }).catch((err) => {
@@ -145,7 +162,7 @@ class NoteModel {
                 response.message = err;
                 reject(response)
             })
-            // Notes.findByIdAndUpdate(req.id, { $set: noteModel }).then((update) => {
+            // Notes.findByIdAndUpdate(req.noteId, { $set: noteModel }).then((update) => {
             //     response.success = true;
             //     response.message = "Note Updated Successfully";
             //     response.data = data;
@@ -167,7 +184,7 @@ class NoteModel {
             err: ''
         }
         return new Promise((resolve, reject) => {
-            Notes.findByIdAndRemove({ _id: req.noteId }).then((data) => {
+            Notes.findByIdAndRemove({ _id: req }).then((data) => {
                 if (data == null) {
                     response.message = 'note doesnot exist',
                         response.success = 'false',
@@ -198,7 +215,7 @@ class NoteModel {
             // let labels = await labelS.findOne({ _id: req.labelId })
             // console.log(" label object", labels);
 
-            Notes.findOneAndUpdate({ _id: req.noteId }, { $push: { label: req.labelId } }).then((data) => {
+            Notes.findOneAndUpdate({ _id: req.noteId }, { $addToSet: { label: req.labelId } }, { new: true }).then((data) => {
                 resolve(data);
             }).catch((err) => {
                 reject(err);
@@ -206,61 +223,108 @@ class NoteModel {
         })
 
 
-        //     , (err, data) => {
-        //     if (err) {
-        //         console.log('error is ', err);
-        //         callback(err, null);
-        //     } else if (data != null) {
-        //         console.log('data is ', data);
-        //         callback(null, data)
-        //     } else {
-        //         response.message = "Label does Not Exist"
-        //         callback(response)
-        //     }
-        // })
+
+    }
+    removeNoteLabel(req) {
+        return new Promise(async (resolve, reject) => {
+            console.log(" labels data in model  ", req);
+            // let labels = await labelS.findOne({ _id: req.labelId })
+            // console.log(" label object", labels);
+
+            Notes.findOneAndUpdate({ _id: req.noteId }, { $pull: { label: req.labelId } }, { new: true }).then((data) => {
+                resolve(data);
+            }).catch((err) => {
+                reject(err);
+            })
+        })
     }
 
-    /**
- * @description  : It will save label in note.
- * @param   {* request from frontend} noteId
- * @param   {* request from frontend} labelParam
- * @param   {* response to backend} callback
- */
-    savelabelToNote(noteId, labelParam, callback) {
-        try {
-            console.log(noteId, labelParam)
 
-            // if(labelParam !== null){
-            //     callback("Write something on label");
-            // }
-            // else{
-            var labelledNote = labelParam
-            note.findOneAndUpdate({ _id: noteId }, { $push: { label: labelledNote } }, (err, result) => {
-                if (err) {
-                    callback(err)
-                } else {
-                    console.log('in model success')
-                    const res = result.label
-                    res.push(labelledNote)
-                    return callback(null, res)
-                }
+    addCollaboratorToNote(req, collaberator) {
+        return new Promise(async (resolve, reject) => {
+            // console.log(" labels data ", req);
+            // let labels = await labelS.findOne({ _id: req.labelId })
+            // console.log(" label object", labels);
+            console.log(" collaborator in shema  ", collaberator);
+
+            Notes.findOneAndUpdate({ _id: req.noteId }, { $addToSet: { collaberators: collaberator } }, { new: true }).then((data) => {
+                console.log(" dta", data);
+
+                resolve(data);
+            }).catch((err) => {
+                reject(err);
             })
-            // }
-        } catch (error) {
-            console.log(' Catch the save label to note Model Block')
-            callback.status(400).send({
-                success: false,
-                message: 'Catch the save label to note Model Block'
+        })
+    }
+
+    removeNoteCollaborator(req, collaberator) {
+        console.log(" collbo in remove ", collaberator);
+
+        return new Promise((resolve, reject) => {
+            Notes.findOneAndUpdate({ _id: req.noteId }, { $pull: { collaberators: collaberator._id } }, { new: true }).then((data) => {
+                console.log(" remove succfull ", data);
+
+                resolve(data);
+            }).catch((err) => {
+                reject(err);
             })
+        })
+
+    }
+
+    ArrayUpdate(req) {
+        console.log(" reminder in schema ", req);
+
+        return new Promise((resolve, reject) => {
+            Notes.findOneAndUpdate({ _id: req.noteId }, { $pull: { reminder: req.reminder } }, { new: true }).then((data) => {
+                console.log(" remove succfull ", data);
+
+                resolve(data);
+            }).catch((err) => {
+                reject(err);
+            })
+        })
+    }
+
+    getNotes(param) {
+        // console.log(" param in schema ", param);
+        // console.log(" request ", req.id);
+        var response = {
+            success: false,
+            message: '',
+            data: '',
+            err: ''
         }
+        return new Promise((resolve, reject) => {
+            // console.log(" in model ", param.data.id);
+
+            Notes.find(param)
+                .populate('collaberators')
+                .populate('label')
+                .then((data) => {
+                    // console.log(" successfull ", data);
+                    response.success = true;
+                    response.message = "getting all cards successfully"
+                    response.data = data
+                    resolve(response)
+                }).catch((err) => {
+                    // console.log(" err in ", err);
+                    response.success = false
+                    response.message = "Note Does Not exist error";
+                    response.err = err
+                    reject(response)
+                })
+
+        })
     }
 
-    addCollaboratorToNote() {
+    searchNote(param) {
+        let value = "'.*'" + param + "'.*','i'"
+        console.log(" value ****", value);
+
 
     }
-    isArchived() {
 
-    }
 
 }
 

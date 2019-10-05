@@ -45,17 +45,6 @@ class LableSchema {
         })
 
 
-        // labelsave.save((err, data) => {
-        //     if (err) {
-        //         response.message = "label already exist";
-        //         response.err = err;
-        //         callback(response)
-        //     } else {
-        //         response.success = true;
-        //         response.message = "Label Added successfully";
-        //         callback(null, response)
-        //     }
-        // })
     }
 
 
@@ -92,13 +81,25 @@ class LableSchema {
     }
 
     getAllLabels(req) {
+        var response = {
+            success: false,
+            message: "",
+            data: "",
+            err: ""
+        }
         return new Promise((resolve, reject) => {
             label.find({ userId: req.data.id }).then((data) => {
                 console.log(" data in find all labels of useer", data);
-                resolve(data)
+                response.success = true;
+                response.message = "getting all cards successfully"
+                response.data = data
+                resolve(response)
             }).catch((err) => {
                 console.log(err);
-                reject(err)
+                response.success = false
+                response.message = "Note Does Not exist error";
+                response.err = err
+                reject(response)
             })
         })
 
@@ -117,20 +118,20 @@ class LableSchema {
             label.findByIdAndRemove({ _id: req.labelId }).then((data) => {
 
 
-                if(data==null){
+                if (data == null) {
                     console.log("data after delete  ", data);
                     response.success = true;
                     response.message = "Label not  successfully";
                     response.data = data
                     resolve(response)
-                }else{
+                } else {
                     console.log("data after delete  ", data);
                     response.success = true;
                     response.message = "Label deleted successfully";
                     response.data = data
                     resolve(response)
                 }
-      
+
 
             }).catch((err) => {
                 console.log(err);

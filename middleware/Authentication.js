@@ -1,7 +1,9 @@
 const jwt = require('jsonwebtoken');
 const config = require('../config/config')
-var auth =  (req, res, next)=> {
-     token = req.headers['token']
+var auth = (req, res, next) => {
+    let token = req.headers['token']
+     console.log(" tokemn=====>>>>>>",token);
+     
      jwt.verify(token, config.secretKey, function (err, decoded) {
           if (err) {
                // console.log(err);
@@ -10,10 +12,9 @@ var auth =  (req, res, next)=> {
                // console.log('decoded data', decoded);
                req.body['data'] = decoded;
                // console.log(req.body);
-               req.token=decoded;
+               req.token = decoded;
                next();
           }
-
      });
 
 }
