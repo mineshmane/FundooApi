@@ -131,6 +131,22 @@ class NoteService {
 
         return noteModel.getNotes(param)
     }
+    getReminderNoteService(req) {
+        console.log(" req.data ", req.data.id);
+        let param = { userId: req.data.id, reminder: !null }
+
+        console.log(" param s in reminder service ", param);
+
+        return noteModel.getNotes(param)
+    }
+    getTrashNoteService(req) {
+        console.log(" req.data ", req.data.id);
+        let param = { userId: req.data.id, isDeleted: true }
+
+        console.log(" param s in reminder service ", param);
+
+        return noteModel.getNotes(param)
+    }
 
 
     removeReminder(req) {

@@ -146,6 +146,28 @@ class NoteController {
             res.send(err)
         })
     }
+    async getReminderdNotes(req, res) {
+        console.log(" req ", req.body);
+
+        await service.getReminderNoteService(req.body).then((data) => {
+
+            console.log(data);
+            res.send(data)
+        }).catch((err) => {
+            res.send(err)
+        })
+    }
+    async getTrashNotes(req, res) {
+        console.log(" req ", req.body);
+
+        await service.getTrashNoteService(req.body).then((data) => {
+
+            console.log(data);
+            res.send(data)
+        }).catch((err) => {
+            res.send(err)
+        })
+    }
 
     async removeReminder(req, res) {
         await service.removeReminder(req.body).then((data) => {

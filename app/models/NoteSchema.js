@@ -16,10 +16,12 @@ const notesSchema = new mongoose.Schema({
         // required: [true, 'Title is required']
     },
     description: String,
-    isPin: Boolean,
+    isPined: Boolean,
     isArchived: Boolean,
     isDeleted: Boolean,
-    reminder: [String],
+    reminder: [
+        String]
+    ,
     images: Array,
     color: String,
     label: [{
@@ -55,7 +57,7 @@ class NoteModel {
         let newNote = new Notes({
             title: req.title,
             description: req.description ? req.description : "",
-            isPin: req.isPin ? req.isPin : false,
+            isPined: req.isPined ? req.isPined : false,
             isArchived: req.isArchived ? req.isArchived : false,
             isDeleted: req.isDeleted ? req.isDeleted : false,
             reminder: req.reminder ? req.reminder : "",
@@ -144,7 +146,7 @@ class NoteModel {
             var noteModel = {
                 title: req.title ? req.title : data.title,
                 description: req.description ? req.description : data.description,
-                isPin: req.isPin ? req.isPin : data.isPin,
+                isPined: req.isPined ? req.isPined : data.isPined,
                 isArchived: req.isArchived ? req.isArchived : data.isArchived,
                 isDeleted: req.isDeleted ? req.isDeleted : data.isDeleted,
                 reminder: req.reminder ? req.reminder : data.reminder,
@@ -287,7 +289,7 @@ class NoteModel {
     }
 
     getNotes(param) {
-        // console.log(" param in schema ", param);
+        console.log(" param in schema ", param);
         // console.log(" request ", req.id);
         var response = {
             success: false,

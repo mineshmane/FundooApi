@@ -13,9 +13,7 @@ const labelSchema = mongoose.Schema({
 })
 let label = mongoose.model('label', labelSchema);
 
-
 class LableSchema {
-
     careateLabelSchema(req) {
         var response = {
             success: false,
@@ -46,8 +44,6 @@ class LableSchema {
 
 
     }
-
-
 
     findAndupdateLabel(req) {
         var response = {

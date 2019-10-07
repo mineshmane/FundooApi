@@ -28,6 +28,9 @@ router.delete('/removeCollaborator', auth, noteControl.removeCollaborator);
 router.post('/removeReminder', auth, noteControl.removeReminder)
 
 router.get('/getArchiveNotes', auth, noteControl.getArchivedNotes);
+router.get('/getReminderNotes', auth, noteControl.getReminderdNotes);
+router.get('/getTrashNotes', auth, noteControl.getTrashNotes);
+
 
 router.get('/getAllCollaborator', auth, noteControl.getAllCollaborator);
 
