@@ -83,7 +83,7 @@ class NoteModel {
                         response.data = null,
                         response.status = 500,
                         response.error = error
-                    reject(response);
+                    reject(response); label
                 })
 
         });
@@ -107,7 +107,7 @@ class NoteModel {
                 .populate('label') // only return the Persons name , { collaberators: { $elemMatch: { userId: req.id } } }
                 // .exec()
                 .then((AllNotes) => {
-                    response.success = true;
+                    response.success = true; label
                     response.message = "getting all cards successfully"
                     response.data = AllNotes
                     resolve(response)
@@ -128,6 +128,8 @@ class NoteModel {
 
         return new Promise((resolve, reject) => {
             Notes.findById({ _id: req.noteId }).then((data) => {
+                console.log(" request ", data);
+
                 resolve(data)
             }).catch((err) => {
                 reject(err)
@@ -135,7 +137,8 @@ class NoteModel {
         })
     }
     updateNote(req, data) {
-        console.log(" req in model ", req);
+
+        console.log(" req in model ererere*&*&&*&*&*&*&*&*&*", req, data);
 
         return new Promise((resolve, reject) => {
             var response = {
@@ -143,6 +146,7 @@ class NoteModel {
                 message: '',
                 data: ''
             }
+
             var noteModel = {
                 title: req.title ? req.title : data.title,
                 description: req.description ? req.description : data.description,
@@ -153,7 +157,11 @@ class NoteModel {
                 color: req.color ? req.color : data.color,
                 userId: req.data.id
             }
-            Notes.updateOne({ _id: req.noteId }, noteModel).then((result) => {
+            console.log(" note model ***", noteModel);
+
+            Notes.updateOne({ _id: req.noteId }, noteModel, { new: true }).then((result) => {
+                console.log(" updted successfully", result);
+
                 response.success = true;
                 response.message = "Note Updated Successfully";
                 response.data = result;
@@ -212,6 +220,8 @@ class NoteModel {
     }
 
     addLabelToNote(req) {
+        console.log(" request for note schema  add label to notev&*&&&*&*&*&* ", req);
+
         return new Promise(async (resolve, reject) => {
             // console.log(" labels data ", req);
             // let labels = await labelS.findOne({ _id: req.labelId })
@@ -309,7 +319,7 @@ class NoteModel {
                     response.message = "getting all cards successfully"
                     response.data = data
                     resolve(response)
-                }).catch((err) => {
+                }).catch((err) => {userId
                     // console.log(" err in ", err);
                     response.success = false
                     response.message = "Note Does Not exist error";
@@ -320,9 +330,27 @@ class NoteModel {
         })
     }
 
-    searchNote(param) {
+    searchNote(param, userId) {
         let value = "'.*'" + param + "'.*','i'"
+        let value = param
+        console.log(" seacrh value", value);
+        console.log();
+
+
         console.log(" value ****", value);
+        return new Promise((resolve, reject) => {
+            let searchValue =
+                Notes.find({_id:userId}, {description: { $regex: value }} ).then((data) => {
+                    resolve(data)
+                    console.log("searched  data found ", data);
+
+                }).catch((err) => {
+                    console.log(" errr found in model ", err);
+
+                    reject(err)
+                })
+        })
+
 
 
     }

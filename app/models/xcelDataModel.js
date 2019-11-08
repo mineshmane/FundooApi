@@ -110,7 +110,17 @@ class UserInfo {
             // console.log(" nrew user created ", newUser);
 
         })
+    }
 
+
+    getUserDataToFile() {
+        return new Promise((resolve, reject) => {
+            userInfo.find().then((data) => {
+                resolve(data);
+            }).catch((err) => {
+                reject(err)
+            })
+        })
 
     }
 

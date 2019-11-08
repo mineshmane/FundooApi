@@ -14,13 +14,15 @@ router.post('/profile/upload', auth, userController.uploadFile)
 
 router.post('/addNotes', auth, noteControl.createNote);
 router.get('/getAllNotes', auth, noteControl.getAllNotes);
-router.post('/SearchNoteList',auth,noteControl.searchNote)
+
+router.post('/getNotesListByLabel', auth, noteControl.searchNote)
 
 router.post('/updateNote', auth, noteControl.updateNotesController);
-router.delete('/deleteNoteForever', auth, noteControl.deleteForeverNote);
+router.post('/deleteNoteForever', auth, noteControl.deleteForeverNote);
 router.post('/addLabelToNote', auth, noteControl.addLabeltoNote)
 
-router.post('/addXcelFile', auth, noteControl.xlController)
+router.post('/uploadXcelFile', auth, noteControl.xlController)
+router.get('/downloadXcelFile', auth, noteControl.getFiledataController);
 router.post('/removeNoteLabel', auth, noteControl.removeNoteLabel);
 
 router.post('/addCollaboratorToNote', auth, noteControl.addCollaborator)
@@ -37,7 +39,7 @@ router.get('/getAllCollaborator', auth, noteControl.getAllCollaborator);
 router.post('/createLabel', auth, labelControl.createLabel);
 router.post('/updateLabel', auth, labelControl.updateLabel)
 router.get('/getAllLabels', auth, labelControl.getAllLabels);
-router.post('/deleteLabel', auth, labelControl.deleteLabel);
+router.delete('/deleteLabel', auth, labelControl.deleteLabel);
 
 
 console.log(" in the router ");

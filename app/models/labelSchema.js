@@ -15,6 +15,8 @@ let label = mongoose.model('label', labelSchema);
 
 class LableSchema {
     careateLabelSchema(req) {
+        // console.log(" request in model create label $%$%$%$%$%$%====",req);
+
         var response = {
             success: false,
             message: "",
@@ -25,9 +27,11 @@ class LableSchema {
             labelName: req.labelName,
             userId: req.data.id
         })
+        // console.log(" req *&*&*&*&*&*&*&*&*&*  ", newLabel);
+
         return new Promise((resolve, reject) => {
             newLabel.save().then((data) => {
-                console.log(" data saved successfully ", data);
+                // console.log(" data saved successfully ", data);
                 response.success = true;
                 response.message = "Label Added successfully";
                 response.data = data
@@ -85,7 +89,7 @@ class LableSchema {
         }
         return new Promise((resolve, reject) => {
             label.find({ userId: req.data.id }).then((data) => {
-                console.log(" data in find all labels of useer", data);
+                // console.log(" data in find all labels of useer", data);
                 response.success = true;
                 response.message = "getting all cards successfully"
                 response.data = data
@@ -102,7 +106,7 @@ class LableSchema {
     }
 
     deleteLabel(req) {
-        console.log(req.labelId);
+        // console.log("&*&*&&*78",req.labelId);
 
         var response = {
             success: false,
@@ -115,13 +119,13 @@ class LableSchema {
 
 
                 if (data == null) {
-                    console.log("data after delete  ", data);
+                    // console.log("data after delete  ", data);
                     response.success = true;
                     response.message = "Label not  successfully";
                     response.data = data
                     resolve(response)
                 } else {
-                    console.log("data after delete  ", data);
+                    // console.log("data after delete  ", data);
                     response.success = true;
                     response.message = "Label deleted successfully";
                     response.data = data

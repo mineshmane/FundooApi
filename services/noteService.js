@@ -1,11 +1,13 @@
 const model = require('../app/models/NoteSchema');
 const userModel = require('../app/models/userModel');
 const mongoose = require('mongoose')
+const labelServices = require('../services/labelService')
 const collab = require('../app/models/collaboratorSchema')
 const xlsdata = require('../app/models/xcelDataModel')
 const userSchema = new userModel.UserModel;
 const collabSchema = new collab.CollaboratorModel;
 const noteModel = new model.NoteModel
+const labelService = new labelServices.LabelService;
 const userInfoSchema = new xlsdata.UserInfo;
 class NoteService {
 
@@ -48,6 +50,7 @@ class NoteService {
     }
 
     async updateNoteService(req) {
+        console.log(" servic notes service ", req);
 
         // let data = await noteModel.updateNote(req)
         // console.log(" data",data);
@@ -62,8 +65,20 @@ class NoteService {
         if (card) {
             console.log(" data after find ", card);
             console.log(" req in service update ", req);
+            // var noteModel = {
+            //     title: req.title ? req.title : data.title,
+            //     description: req.description ? req.description : data.description,
+            //     isPined: req.isPined ? req.isPined :  false,
+            //     isArchived: req.isArchived ? req.isArchived : false,
+            //     isDeleted: req.isDeleted ? req.isDeleted : false,
+            //     reminder: req.reminder ? req.reminder : data.reminder,
+            //     color: req.color ? req.color : data.color,
+            //     userId: req.data.id
+            // }
 
             let data = await noteModel.updateNote(req, card);
+            console.log(" after update service notes ^&&^&^&^&^&",data);
+            
             return data
         } else {
             response.success = false,
@@ -83,8 +98,25 @@ class NoteService {
         return noteModel.deleteNote(param);
     }
 
-    addlabelToNote(req) {
-        return noteModel.addLabelToNote(req)
+    async addlabelToNote(req) {
+        let labelRequest;
+        // console.log(" req in ", req);
+
+        if (req.labelId == undefined) {
+            // console.log(" undefined label id^&&&**&*&*&*&*&*&*&* ");
+
+            let labelData = await labelService.createLabelService(req);
+            // console.log(" labelData in controller ", labelData.data._id, req.noteId);
+
+            let obj = {
+                "noteId": req.noteId,
+                "labelId": labelData.data._id
+            }
+            labelRequest = obj
+        } else {
+            labelRequest = req
+        }
+        return noteModel.addLabelToNote(labelRequest)
     }
 
     removeNoteLabelService(req) {
@@ -133,7 +165,7 @@ class NoteService {
     }
     getReminderNoteService(req) {
         console.log(" req.data ", req.data.id);
-        let param = { userId: req.data.id, reminder: !null }
+        let param = { userId: req.data.id, reminder: { $nin: [null, ""] } }
 
         console.log(" param s in reminder service ", param);
 
@@ -155,7 +187,11 @@ class NoteService {
 
 
     searchNoteService(req) {
-        return noteModel.searchNote(req)
+        console.log(" *******&*&&*", req);
+
+        let userId = req.data.id
+        let search = req.searchValue
+        return noteModel.searchNote(search, userId)
     }
 
     xlsService(req) {
@@ -174,6 +210,11 @@ class NoteService {
         })
 
 
+    }
+
+
+    getXcelDataService(req) {
+        return userInfoSchema.getUserDataToFile(req)
     }
 
 }

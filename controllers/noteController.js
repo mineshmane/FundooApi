@@ -1,4 +1,5 @@
 const notesService = require('../services/noteService');
+
 const multerService = require('../services/xlsService')
 const methods = require('../services/xlsService')
 var xlstojson = require("xls-to-json-lc");
@@ -6,6 +7,7 @@ var xlsxtojson = require('xlsx-to-json-lc');
 // const method = new methods.Xcel;
 // let multi = methods.upload;
 const service = new notesService.NoteService;
+
 class NoteController {
 
 
@@ -44,8 +46,12 @@ class NoteController {
             }
             await service.updateNoteService(req.body)
                 .then((result) => {
+                    // console.log(" in controller in update ", result);
+
                     res.status(200).send(result);
                 }).catch((err) => {
+                    console.log(" errrin controller ", err);
+
                     response.success = false,
                         response.message = 'plase provide note id ',
                         response.status = 500,
@@ -71,11 +77,12 @@ class NoteController {
 
     async   addLabeltoNote(req, res) {
         console.log(" req ", req.body);
-        let obj = {
-            "noteId": req.body.noteId,
-            "labelId": req.body.labelId
-        }
-        console.log(" label Obehct in controller ", obj);
+
+        // let obj = {
+        //     "noteId": req.body.noteId,
+        //     "labelId": req.body.labelId
+        // }
+        // console.log(" label Obehct in controller ", obj);
 
 
         await service.addlabelToNote(req.body).then((data) => {
@@ -177,8 +184,14 @@ class NoteController {
         })
     }
 
-    async searchNote(req) {
-        service.searchNoteService(req.body)
+    async searchNote(req, res) {
+        console.log(" req in controller ",req.body);
+        
+        service.searchNoteService(req.body).then((data) => {
+            res.send(data)
+        }).catch((err) => {
+            res.send(err)
+        })
     }
 
 
@@ -293,6 +306,13 @@ class NoteController {
         //     }
         // })
 
+    }
+    async getFiledataController(req, res) {
+        await service.getXcelDataService(req.body).then((data) => {
+            res.send(data)
+        }).catch((err) => {
+            res.send(err)
+        })
     }
 
 

@@ -4,6 +4,8 @@ class LabelService {
 
 
     createLabelService(req) {
+        // console.log(" req in create label service ", req);
+
         let data = labelModel.careateLabelSchema(req);
         return data;
 
@@ -14,12 +16,12 @@ class LabelService {
         return response;
     }
 
-    getAllLabelService(req){
-        let response=labelModel.getAllLabels(req);
+    getAllLabelService(req) {
+        let response = labelModel.getAllLabels(req);
         return response;
     }
-    deleteLabel(req){
-        let response=labelModel.deleteLabel(req);
+    deleteLabel(req) {
+        let response = labelModel.deleteLabel(req);
         return response;
     }
 }
